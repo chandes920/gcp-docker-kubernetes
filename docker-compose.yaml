@@ -1,0 +1,20 @@
+version: '3'
+services:
+  login-back:
+    image: postgres:localv1
+    container_name: login-back
+    environment:
+      POSTGRES_PASSWORD: "password"
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+
+  login-front:
+    image: login:test
+    container_name: login-front
+    restart: always
+    depends_on:
+      - login-back
+    ports:
+      - "5000:5000"
