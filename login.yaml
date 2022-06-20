@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-back
+  template:
+    metadata:
+      labels:
+        app: login-back
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: login-back
+        image: acrtestingaks.azurecr.io/postgres:v1
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "password"
+        ports:
+        - containerPort: 5432
+          name: login-back
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-back
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: login-back
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-front
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: login-front
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: login-front
+        image: acrtestingaks.azurecr.io/login:v1
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-front
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+  selector:
+    app: login-front
