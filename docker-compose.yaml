@@ -1,7 +1,7 @@
 version: '3'
 services:
   login-back:
-    image: postgres:localv1
+    image: postgres:v1
     container_name: login-back
     environment:
       POSTGRES_PASSWORD: "password"
@@ -11,7 +11,7 @@ services:
       - "5432:5432"
 
   login-front:
-    image: login:test
+    image: login:v1
     container_name: login-front
     restart: always
     depends_on:
