@@ -18,16 +18,17 @@ def login():
     
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
    
-    # Check if "username" and "password" POST requests exist (user submitted form)
+    # See if "username" and "password" are in the POST requests
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
  
-        # Check if account exists using MySQL
+        # Compare with PostgreSQL and see if the account exists
         cursor.execute('SELECT * FROM public.users WHERE username = %s', (username,))
         # Fetch one record and return result
         account = cursor.fetchone()
- 
+        
+        # If the account exists, check if password is correct
         if account:
             # If account exists in users table in out database
             if account['username'] == username and account['password'] == password:
